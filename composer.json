@@ -1,0 +1,24 @@
+{
+  "name": "patrickschur/aiml-converter",
+  "type": "library",
+  "description": "Converts AIML to CSV and CSV to AIML.",
+  "keywords": ["aiml", "aiml-converter", "aiml2", "csv2aiml", "aiml2csv", "csv"],
+  "homepage": "https://github.com/patrickschur/aiml-converter",
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "Patrick Schur",
+      "email": "patrick_schur@outlook.de"
+    }
+  ],
+  "require": {
+    "php": ">=5.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "AIMLConverter\\": "src"
+    }
+  }
+}
