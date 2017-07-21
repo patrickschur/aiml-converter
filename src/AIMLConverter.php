@@ -121,20 +121,27 @@ class AIMLConverter
             throw new \InvalidArgumentException('Wrong MIME content type or file extension');
         }
 
-        $handle = fopen($filename, 'r');
-
-        if (!$handle) {
-            return false;
-        }
-
         /** @var \DOMElement[] $files */
         $files = [];
 
-        while (($row = fgetcsv($handle)) !== false)
+        foreach (file($filename, FILE_SKIP_EMPTY_LINES) as $row)
         {
-            if (count($row) !== 6) {
+            $row = explode(',', $row, 5);
+
+            if (!isset($row[4])) {
                 continue;
             }
+
+            $tmp = explode(',', strrev($row[4]), 2);
+
+            if (count($tmp) !== 2) {
+                continue;
+            }
+
+            $row[4] = strrev($tmp[1]);
+            $row[5] = strrev($tmp[0]);
+
+            $row = array_map('trim', $row);
 
             if (!isset($files[$row[5]]))
             {
@@ -164,7 +171,13 @@ class AIMLConverter
             $files[$row[5]]->appendChild($category);
         }
 
-        fclose($handle);
+        $emptyTags = [
+            'that', 'input', 'request', 'response',
+            'date', 'sr', 'id', 'program', 'vocabulary',
+            'bot', 'star', 'topicstar', 'thatstar', 'get'
+        ];
+
+        $emptyTags = implode('|', $emptyTags);
 
         foreach ($files as $filename => $aiml)
         {
@@ -173,6 +186,8 @@ class AIMLConverter
             $data = $this->document->saveXML();
             $data = html_entity_decode($data);
             $data = str_replace(['#Comma', '#Newline'], [',', PHP_EOL], $data);
+
+            $data = preg_replace('/(<(' . $emptyTags . ')[^>]+?)>(?!.*?<\/\2>)/', '\\1/>', $data);
 
             file_put_contents($filename, $data);
 
